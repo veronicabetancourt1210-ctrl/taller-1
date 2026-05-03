@@ -2,26 +2,42 @@ import * as gamesService from './games.service.js';
 
 //CREAR JUEGO
 export const createJuego = (req, res) => {
-   
-    const { nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado } = req.body;
+   const { id, nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado } = req.body;
 
-    //Validacion para registrar un juego
-    if (!nombre || !minJugadores || !maxJugadores || !duracionPromedio || !fechaAdquisicion || !estado) {
+    //Validar que el juego a registrar tenga todos sus campos
+    const campos = [id, nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado];
+    
+    if (campos.some(campo => campo === undefined || campo === "")) {
         return res.status(400).json({ 
             error: "Datos incompletos", 
-            mensaje: "Fallo el registro del juego. Todos los campos (nombre, jugadores, duración, fecha y estado) son obligatorios." 
+            mensaje: "Fallo el registro del juego. Todos los campos, incluyendo el ID, son obligatorios." 
         });
     }
 
-    
+    //Validar que el estado ingresado sea alguno de los estados validos
     const estadosValidos = ["En perfectas condiciones", "Ligeramente usado", "Deteriorado", "Dañado"];
     if (!estadosValidos.includes(estado)) {
-        return res.status(400).json({ error: "Estado inválido", mensaje: `Fallo en el registro del juego. El estado debe ser uno de los siguientes: ${estadosValidos.join(", ")}`  });
+        return res.status(400).json({
+            error: "Estado no válido",
+            mensaje: `El estado '${estado}' no es permitido. Los estados válidos son: ${estadosValidos.join(", ")}.`
+        });
     }
 
+    // Validar que el id ingresado no exista en la base de datos
+    const juegoExistente = gamesService.getById(id); 
+    if (juegoExistente) {
+        return res.status(409).json({ 
+            error: "ID duplicado",
+            mensaje: `Ya existe un juego registrado con el ID ${id}. Por favor, usa uno diferente.`
+        });
+    }
+
+    //Registro del juego
     const nuevo = gamesService.create(req.body);
-    res.status(201).json({ mensaje: "Juego registrado con éxito", juego: nuevo });
-    
+    res.status(201).json({ 
+        mensaje: "Juego registrado con éxito", 
+        juego: nuevo 
+    });
 
 };
 
