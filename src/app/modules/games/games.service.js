@@ -25,24 +25,24 @@ export const create = (data) => {
     return nuevoJuego;
 };
 
-//Consultar todo el catálogo
+//CONSULTAR TODO EL CATALOGO
 export const getAll = () => juegos;
 
-//Buscar en Catálogo
+//BUSCAR JUEGO EN CATALOGO
 export const getById = (id) => juegos.find(j => j.id === id);
 
-//Actualizar Catálogo
+//ACTUALIZAR CATALOGO
 export const update = (id, data) => {
     const index = juegos.findIndex(j => j.id === id);
     if (index !== -1) {
-        // Mantenemos el ID original e integramos los nuevos datos
+       
         juegos[index] = { ...juegos[index], ...data, id };
         return juegos[index];
     }
     return null;
 };
 
-//Eliminar juego de catálogo
+//ELIMINAR JUEGO DE CATALOGO
 export const remove = (id) => {
     const index = juegos.findIndex(j => j.id === id);
     if (index !== -1) {
