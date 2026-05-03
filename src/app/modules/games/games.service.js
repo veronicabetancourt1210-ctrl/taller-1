@@ -13,6 +13,8 @@ let juegos = [
 
 //INGRESAR JUEGO A CATALOGO
 export const create = (data) => {
+    
+
     const nuevoJuego = {
         ...data 
     };
@@ -21,15 +23,17 @@ export const create = (data) => {
     return nuevoJuego;
 };
 
-//CONSULTAR TODO EL CATALOGO
+//Consultar todo el catálogo
 export const getAll = () => juegos;
 
-//BUSCAR JUEGO EN CATALOGO
-export const getById = (id) => juegos.find(j => j.id === id);
+//Buscar en Catálogo
+export const getById = (id) => juegos.find(j => String(j.id) === String(id));
 
-//ACTUALIZAR CATALOGO
+
+//Actualizar Catálogo
 export const update = (id, data) => {
-    const index = juegos.findIndex(j => j.id === id);
+    const index = juegos.findIndex(j => String(j.id) === String(id));
+  
     if (index !== -1) {
        
         juegos[index] = { ...juegos[index], ...data, id };
@@ -38,9 +42,10 @@ export const update = (id, data) => {
     return null;
 };
 
-//ELIMINAR JUEGO DE CATALOGO
+//Eliminar juego de catálogo
 export const remove = (id) => {
-    const index = juegos.findIndex(j => j.id === id);
+    const index = juegos.findIndex(j => String(j.id) === String(id));
+  
     if (index !== -1) {
         juegos.splice(index, 1);
         return true; 
