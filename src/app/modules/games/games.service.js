@@ -13,14 +13,10 @@ let juegos = [
 
 //INGRESAR JUEGO A CATALOGO
 export const create = (data) => {
-    const estadosValidos = ["En perfectas condiciones", "Ligeramente usado", "Deteriorado", "Dañado"];
-    
-
     const nuevoJuego = {
-        id: juegos.length > 0 ? juegos[juegos.length - 1].id + 1 : 1, 
-        ...data //id autogenerado
+        ...data 
     };
-    
+
     juegos.push(nuevoJuego);
     return nuevoJuego;
 };
