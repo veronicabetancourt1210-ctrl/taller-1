@@ -8,6 +8,25 @@ let juegos = [
         duracionPromedio: 20, 
         fechaAdquisicion: "2024-05-02", 
         estado: "En perfectas condiciones" 
+    },
+
+    {
+        id: "2",
+        nombre: "Dominó",
+        minJugadores: 2,
+        maxJugadores: 4,
+        duracionPromedio: 30,
+        fechaAdquisicion: "2026-01-15",
+        estado: "En perfectas condiciones"
+    },
+    {
+        id: "3",
+        nombre: "Catan",
+        minJugadores: 3,
+        maxJugadores: 4,
+        duracionPromedio: 90,
+        fechaAdquisicion: "2026-02-20",
+        estado: "Ligeramente usado"
     }
 ];
 
