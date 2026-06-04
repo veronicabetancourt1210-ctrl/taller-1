@@ -2,27 +2,72 @@ import * as gamesService from './games.service.js';
 
 //CREAR JUEGO
 export const createJuego = (req, res) => {
-   
-    const { nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado } = req.body;
+   const { id, nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado } = req.body;
 
-    //Validacion para registrar un juego
-    if (!nombre || !minJugadores || !maxJugadores || !duracionPromedio || !fechaAdquisicion || !estado) {
+    //Validación de campos obligatorios
+    const camposObligatorios = [id, nombre, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion, estado];
+    if (camposObligatorios.some(campo => campo === undefined || campo === "")) {
         return res.status(400).json({ 
             error: "Datos incompletos", 
-            mensaje: "Fallo el registro del juego. Todos los campos (nombre, jugadores, duración, fecha y estado) son obligatorios." 
+            mensaje: "Fallo el registro del juego. Todos los campos, incluyendo el ID, son obligatorios." 
         });
     }
 
-    
-    const estadosValidos = ["En perfectas condiciones", "Ligeramente usado", "Deteriorado", "Dañado"];
-    if (!estadosValidos.includes(estado)) {
-        return res.status(400).json({ error: "Estado inválido", mensaje: `Fallo en el registro del juego. El estado debe ser uno de los siguientes: ${estadosValidos.join(", ")}`  });
+    // Validación de Tipos Numéricos 
+    if (typeof minJugadores !== 'number' || minJugadores < 1) {
+        return res.status(400).json({ 
+            error: "Dato inválido", 
+            mensaje: "El mínimo de jugadores debe ser un número mayor o igual a 1." 
+        });
     }
 
-    const nuevo = gamesService.create(req.body);
-    res.status(201).json({ mensaje: "Juego registrado con éxito", juego: nuevo });
-    
+    if (typeof maxJugadores !== 'number' || maxJugadores < minJugadores) {
+        return res.status(400).json({ 
+            error: "Dato inválido", 
+            mensaje: "El máximo de jugadores debe ser un número y no puede ser menor al mínimo." 
+        });
+    }
 
+    if (typeof duracionPromedio !== 'number' || duracionPromedio <= 0) {
+        return res.status(400).json({ 
+            error: "Dato inválido", 
+            mensaje: "La duración promedio debe ser un número positivo." 
+        });
+    }
+
+    // Validación de Formato de Fecha 
+    const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regexFecha.test(fechaAdquisicion) || isNaN(Date.parse(fechaAdquisicion))) {
+        return res.status(400).json({ 
+            error: "Formato inválido", 
+            mensaje: "La fecha debe tener el formato YYYY-MM-DD (ej: 2024-05-03)." 
+        });
+    }
+
+    //Validación de Estados Válidos
+    const estadosValidos = ["En perfectas condiciones", "Ligeramente usado", "Deteriorado", "Dañado"];
+    if (!estadosValidos.includes(estado)) {
+        return res.status(400).json({
+            error: "Estado no válido",
+            mensaje: `El estado '${estado}' no es permitido. Los estados válidos son: ${estadosValidos.join(", ")}.`
+        });
+    }
+
+    //Validar que el ID no esté duplicado
+    const juegoExistente = gamesService.getById(id); 
+    if (juegoExistente) {
+        return res.status(409).json({ 
+            error: "ID duplicado",
+            mensaje: `Ya existe un juego registrado con el ID ${id}. Por favor, usa uno diferente.`
+        });
+    }
+
+    //Registro del juego
+    const nuevo = gamesService.create(req.body);
+    return res.status(201).json({ 
+        mensaje: "Juego registrado con éxito", 
+        juego: nuevo 
+    });
 };
 
 //BUSQUEDA DE JUEGOS
@@ -44,11 +89,80 @@ export const getJuego = (req, res) => {
 
 //ACTUALIZACION JUEGO
 export const updateJuego = (req, res) => {
-    const actualizado = gamesService.update(parseInt(req.params.id), req.body);
+    const idParam = req.params.id;
+    const { id: idBody, estado, minJugadores, maxJugadores, duracionPromedio, fechaAdquisicion } = req.body;
+
+    // Validación de Estados Válidos
+    if (estado) {
+        const estadosValidos = ["En perfectas condiciones", "Ligeramente usado", "Deteriorado", "Dañado"];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({
+                error: "Estado no válido",
+                mensaje: `El estado '${estado}' no es permitido. Estados válidos: ${estadosValidos.join(", ")}.`
+            });
+        }
+    }
+
+    //  Validación de Números 
+    if (minJugadores !== undefined) {
+        if (typeof minJugadores !== 'number' || minJugadores < 1) {
+            return res.status(400).json({ 
+                error: "Dato inválido", 
+                mensaje: "El mínimo de jugadores debe ser un número mayor o igual a 1." 
+            });
+        }
+    }
+
+    if (maxJugadores !== undefined) {
+        if (typeof maxJugadores !== 'number' || maxJugadores < minJugadores) {
+            return res.status(400).json({ 
+                error: "Dato inválido", 
+                mensaje: "El máximo de jugadores debe ser un número y no puede ser menor al mínimo." 
+            });
+        }
+    }
+
+    if (duracionPromedio !== undefined && (typeof duracionPromedio !== 'number' || duracionPromedio <= 0)) {
+        return res.status(400).json({ 
+            error: "Dato inválido", 
+            mensaje: "La duración promedio debe ser un número positivo." 
+        });
+    }
+
+    // Validación de Formato de Fecha (YYYY-MM-DD)
+    if (fechaAdquisicion) {
+        const regexFecha = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regexFecha.test(fechaAdquisicion) || isNaN(Date.parse(fechaAdquisicion))) {
+            return res.status(400).json({ 
+                error: "Formato inválido", 
+                mensaje: "La fecha debe tener el formato YYYY-MM-DD (ej: 2024-05-03)." 
+            });
+        }
+    }
+
+    // Validación de ID Duplicado
+    if (idBody && String(idBody) !== String(idParam)) {
+        const juegoConEseId = gamesService.getById(idBody);
+        if (juegoConEseId) {
+            return res.status(409).json({
+                error: "ID en conflicto",
+                mensaje: `No puedes cambiar al ID ${idBody} porque ya pertenece a otro juego.`
+            });
+        }
+    }
+
+    // Actualización
+    const actualizado = gamesService.update(idParam, req.body);
+
     if (actualizado) {
-        res.status(200).json({ mensaje: "El juego fue actualizado exitosamente", juego: actualizado });
+        return res.status(200).json({ 
+            mensaje: "El juego fue actualizado exitosamente", 
+            juego: actualizado 
+        });
     } else {
-        res.status(404).json({ mensaje: "No se pudo actualizar, juego no encontrado" });
+        return res.status(404).json({ 
+            mensaje: "No se pudo actualizar, juego no encontrado" 
+        });
     }
 };
 
