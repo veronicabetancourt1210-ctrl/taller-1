@@ -140,6 +140,8 @@ window.prepararEdicion = function(id, nombre, min, max, duracion, fecha, estado)
     tituloFormulario.textContent = "Editar Juego";
     btnGuardar.textContent = "Guardar Cambios";
     btnCancelar.style.display = "inline-block";
+    inputId.disabled=true; //impide modificar el id;
+
 
     inputIdOriginal.value = id;
     inputId.value = id;
@@ -155,12 +157,14 @@ function limpiarModoEdicion() {
     tituloFormulario.textContent = "Registrar Nuevo Juego";
     btnGuardar.textContent = "Registrar Juego";
     btnCancelar.style.display = "none";
+    inputId.disabled=false;
+
     inputIdOriginal.value = '';
 }
 
 btnCancelar.addEventListener('click', () => {
-    formulario.reset();
     limpiarModoEdicion();
+    formulario.reset();
 });
 
 btnCargar.addEventListener('click', obtenerJuegos);
