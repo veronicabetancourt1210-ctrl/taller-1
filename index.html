@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller 2</title>
+</head>
+<body>
+
+    <header>
+        <h1>CRUD Juegos de Mesa</h1>
+    </header>
+
+    <main>
+        <section id="seccion-lista">
+            <h2>Listado de Juegos Disponibles</h2>
+            <p>Aquí puedes visualizar, editar o eliminar los juegos registrados en el sistema.</p>
+            <button id="btn-cargar">Refrescar Lista</button>
+            
+            <div id="contenedor-juegos">
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="seccion-formulario">
+            <h2 id="titulo-formulario">Registrar Nuevo Juego</h2>
+            <form id="formulario-juego">
+                <input type="hidden" id="juego-id-original">
+
+                <div>
+                    <label for="juego-id">ID del Juego:</label>
+                    <input type="text" id="juego-id" required>
+                </div>
+                <div>
+                    <label for="juego-nombre">Nombre:</label>
+                    <input type="text" id="juego-nombre" required>
+                </div>
+                <div>
+                    <label for="juego-min">Mínimo de Jugadores:</label>
+                    <input type="number" id="juego-min" min="1" required>
+                </div>
+                <div>
+                    <label for="juego-max">Máximo de Jugadores:</label>
+                    <input type="number" id="juego-max" min="1" required>
+                </div>
+                <div>
+                    <label for="juego-duracion">Duración Promedio (min):</label>
+                    <input type="number" id="juego-duracion" min="1" required>
+                </div>
+                <div>
+                    <label for="juego-fecha">Fecha de Adquisición:</label>
+                    <input type="date" id="juego-fecha" required>
+                </div>
+                <div>
+                    <label for="juego-estado">Estado del Juego:</label>
+                    <select id="juego-estado" required>
+                        <option value="">  Seleccione un estado  </option>
+                        <option value="En perfectas condiciones">En perfectas condiciones</option>
+                        <option value="Ligeramente usado">Ligeramente usado</option>
+                        <option value="Deteriorado">Deteriorado</option>
+                        <option value="Dañado">Dañado</option>
+                    </select>
+                </div>
+                
+                <button type="submit" id="btn-guardar">Registrar Juego</button>
+                <button type="button" id="btn-cancelar" style="display: none;">Cancelar Edición</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
